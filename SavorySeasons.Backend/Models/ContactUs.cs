@@ -10,7 +10,7 @@ namespace SavorySeasons.Backend.Models
 
         public string Email { get; set; } = "savoryseasons@yopmail.com";
 
-        public string MobileNumber { get; set; }
+        public int MobileNumber { get; set; }
 
         public string Message { get; set; }
     }

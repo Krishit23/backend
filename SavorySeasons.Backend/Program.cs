@@ -1,6 +1,9 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.Extensions.Configuration;
 using SavorySeasons.Backend;
 using SavorySeasons.Backend.Models;
+using SavorySeasons.Backend.Validation.ModelValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -13,6 +16,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddEmailServices(builder.Configuration);
 var contactUsConfiguration = configuration.GetSection("ContactUs").Get<ContactUsConfiguration>();
 builder.Services.AddSingleton(contactUsConfiguration);
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining(typeof(ContactValidator));
 
 builder.Services.AddCors(options =>
 {

@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SavorySeasons.Backend.Api.Controllers;
 using SavorySeasons.Backend.Email.Models;
 using SavorySeasons.Backend.Email.Services;
 using SavorySeasons.Backend.Models;
 
 namespace SavorySeasons.Backend.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController] 
-    public class ContactController : ControllerBase
+    public class ContactController : ApiControllerBase
     {
         private readonly IEmailService  _emailService;
         private readonly ContactUsConfiguration _contactUsConfiguration;
@@ -24,8 +23,12 @@ namespace SavorySeasons.Backend.Controllers
 
 
         [HttpPost]
-        public async Task<ActionResult> Post(ContactUs contact)
+        public async Task<ActionResult> Post([FromBody]ContactUs contact)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
             var html = await System.IO.File.ReadAllTextAsync($"{this._webHostEnvironment.WebRootPath.ToLower()}/Template/ContactUs.html");
 
@@ -35,14 +38,13 @@ namespace SavorySeasons.Backend.Controllers
             html = html.Replace("##Linkedin##", $"{"common/linkedin.png"}");
             html = html.Replace("##CompanyLogo##", $"{"common/email-logo.png"}");
 
-            html = html.Replace("##FirstName##", $"{contact.FirstName}");
-            html = html.Replace("##LastName##", contact.LastName);
+            html = html.Replace("##Name##", $"{contact.FirstName} {contact.LastName}");
             html = html.Replace("##Email##", contact.Email);
-            html = html.Replace("##MobileNumber##", contact.MobileNumber);
+            html = html.Replace("##MobileNumber##", $"{contact.MobileNumber}");
             html = html.Replace("##Message##", contact.Message);
             EmailData emailData = new EmailData();
             emailData.ToEmailId = _contactUsConfiguration.Email;
-            emailData.EmailSubject = "New Inquiry";
+            emailData.EmailSubject = "New Enquiry";
             emailData.EmailBody = html;
             await _emailService.SendEmail(emailData);
             return Ok();
