@@ -8,7 +8,7 @@ namespace SavorySeasons.Backend.Validation.ModelValidation
         public ContactValidator()
         {
             RuleFor(_ => _.Email).EmailAddress(); 
-            RuleFor(_ => _.MobileNumber).NotNull().GreaterThan(0); 
+            RuleFor(_ => _.MobileNumber).Matches((@"^[0-9]{10}$")).WithMessage("Phone number is invalid");
         }
     }
 }
